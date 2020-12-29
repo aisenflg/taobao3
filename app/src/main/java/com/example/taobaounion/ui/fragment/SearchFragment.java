@@ -18,4 +18,9 @@ public class SearchFragment extends BaseFragment {
     protected int getRootViewResId() {
         return R.layout.fragment_search;
     }
+
+    @Override
+    protected void initView(View rootView) {
+        setUpState(State.SUCCESS);
+    }
 }

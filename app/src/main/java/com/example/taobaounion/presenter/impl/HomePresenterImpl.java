@@ -56,18 +56,19 @@ public class HomePresenterImpl implements IHomePresenter {
             @Override
             public void onFailure(Call<Categories> call, Throwable e) {
                 //加载失败
+                mCallback.onNetworkError();
                 LogUtils.e(HomePresenterImpl.this, "请求错误" + e.toString());
             }
         });
     }
 
     @Override
-    public void registerCallback(IHomeCallback callback) {
+    public void registerViewCallback(IHomeCallback callback) {
         mCallback = callback;
     }
 
     @Override
-    public void unregisterCallback(IHomeCallback callback) {
+    public void unregisterViewCallback(IHomeCallback callback) {
         mCallback = null;
     }
 }

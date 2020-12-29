@@ -11,8 +11,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.taobaounion.R;
+import com.example.taobaounion.utils.LogUtils;
 
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public abstract class BaseFragment extends Fragment {
@@ -30,17 +32,41 @@ public abstract class BaseFragment extends Fragment {
     private Unbinder mBind;
     private FrameLayout mBaseContainer;
 
+    @OnClick(R.id.network_error_tips)
+    public void retry(){
+        //点击重新加载内容
+        LogUtils.d(this,"网络错误，请重新加载");
+        onRetryClick();
+    }
+
+    /**
+     * 网络错误，点击重新加载
+     */
+    protected void onRetryClick() {
+
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.base_fragment_layout, container, false);
+        View rootView = loadRootView(inflater,container);
         mBaseContainer = rootView.findViewById(R.id.base_container);
         loadStatusView(inflater,container);
         mBind = ButterKnife.bind(this, rootView);
         initView(rootView);
+        initListener();
         initPresenter();
         LoadData();
         return rootView;
+    }
+
+
+    protected void initListener(){
+
+    }
+
+    protected View loadRootView(LayoutInflater inflater, ViewGroup container){
+        return inflater.inflate(R.layout.base_fragment_layout, container, false);
     }
 
     /**

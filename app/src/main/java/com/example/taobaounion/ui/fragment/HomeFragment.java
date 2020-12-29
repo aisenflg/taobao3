@@ -2,7 +2,9 @@ package com.example.taobaounion.ui.fragment;
 
 
 
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.viewpager.widget.ViewPager;
 
@@ -12,7 +14,6 @@ import com.example.taobaounion.model.domain.Categories;
 import com.example.taobaounion.presenter.IHomePresenter;
 import com.example.taobaounion.presenter.impl.HomePresenterImpl;
 import com.example.taobaounion.ui.adapter.HomePagerAdapter;
-import com.example.taobaounion.utils.LogUtils;
 import com.example.taobaounion.view.IHomeCallback;
 import com.google.android.material.tabs.TabLayout;
 
@@ -49,7 +50,12 @@ public class HomeFragment extends BaseFragment implements IHomeCallback {
     protected void initPresenter() {
         //创建presenter
         mHomePresenter = new HomePresenterImpl();
-        mHomePresenter.registerCallback(this);
+        mHomePresenter.registerViewCallback(this);
+    }
+
+    @Override
+    protected View loadRootView(LayoutInflater inflater, ViewGroup container) {
+        return inflater.inflate(R.layout.base_home_fragment_layout,container,false);
     }
 
     @Override
@@ -87,7 +93,14 @@ public class HomeFragment extends BaseFragment implements IHomeCallback {
     protected void release() {
         //取消注册
         if (mHomePresenter != null) {
-            mHomePresenter.unregisterCallback(this);
+            mHomePresenter.unregisterViewCallback(this);
+        }
+    }
+
+    @Override
+    protected void onRetryClick() {
+        if (mHomePresenter != null) {
+            mHomePresenter.getCategories();
         }
     }
 }

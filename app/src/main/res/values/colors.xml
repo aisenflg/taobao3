@@ -9,4 +9,6 @@
 
     <color name="colorTabSelected">#ffffff</color>
     <color name="colorTabNormal">#aaffffff</color>
+    <color name="color_tmall">#D0021B</color>
+    <color name="pager_bg">#EFEEEE</color>
 </resources>
