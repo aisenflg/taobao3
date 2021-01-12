@@ -23,6 +23,7 @@ public class CategoryPagerPresenterImpl implements ICategoryPagerPresenter {
 
     private Map<Integer, Integer> pagerInfo = new HashMap<>();
     public static final int DEFAULT_PAGE = 1;
+    private Integer mCurrentPage;
 
     private CategoryPagerPresenterImpl() {
 
@@ -45,16 +46,12 @@ public class CategoryPagerPresenterImpl implements ICategoryPagerPresenter {
             }
         }
         //根据分类id去加载类容
-        Retrofit retrofit = RetrofitManager.getInstance().getRetrofit();
-        Api api = retrofit.create(Api.class);
         Integer targetPage = pagerInfo.get(categoryId);
         if (targetPage == null) {
             targetPage = DEFAULT_PAGE;
             pagerInfo.put(categoryId, targetPage);
         }
-        String homePagerUrl = UrlUtils.createHomePagerUrl(categoryId, 1);
-        LogUtils.d(this, "homePagerUrl--------------->" + homePagerUrl);
-        Call<HomePagerContent> task = api.getHomePagerContent(homePagerUrl);
+        Call<HomePagerContent> task = createTask(categoryId, targetPage);
         task.enqueue(new Callback<HomePagerContent>() {
             @Override
             public void onResponse(Call<HomePagerContent> call, Response<HomePagerContent> response) {
@@ -75,6 +72,14 @@ public class CategoryPagerPresenterImpl implements ICategoryPagerPresenter {
                 handlerNetworkError(categoryId);
             }
         });
+    }
+
+    private Call<HomePagerContent> createTask(int categoryId, Integer targetPage) {
+        String homePagerUrl = UrlUtils.createHomePagerUrl(categoryId, targetPage);
+        LogUtils.d(this, "homePagerUrl--------------->" + homePagerUrl);
+        Retrofit retrofit = RetrofitManager.getInstance().getRetrofit();
+        Api api = retrofit.create(Api.class);
+        return api.getHomePagerContent(homePagerUrl);
     }
 
     private void handlerNetworkError(int categoryId) {
@@ -103,7 +108,61 @@ public class CategoryPagerPresenterImpl implements ICategoryPagerPresenter {
 
     @Override
     public void loadMore(int categoryId) {
+        //加载更多数据
+        mCurrentPage = pagerInfo.get(categoryId);
+        if (pagerInfo == null) {
+            mCurrentPage = 1;
+        }
+        Call<HomePagerContent> task = createTask(categoryId, mCurrentPage++);
+        task.enqueue(new Callback<HomePagerContent>() {
+            @Override
+            public void onResponse(Call<HomePagerContent> call, Response<HomePagerContent> response) {
+                if (response.code() == HttpURLConnection.HTTP_OK) {
+                    HomePagerContent result = response.body();
+                    LogUtils.d(CategoryPagerPresenterImpl.this, "result---->"+result.toString());
+                    handlerLoadResult(result,categoryId);
+                }else {
+                    handlerLoadMoreError(categoryId);
+                }
+            }
 
+            @Override
+            public void onFailure(Call<HomePagerContent> call, Throwable t) {
+                LogUtils.d(CategoryPagerPresenterImpl.this, t.getMessage());
+                handlerLoadMoreError(categoryId);
+            }
+        });
+    }
+
+    /**
+     * 加载更多数据成功
+     * @param result
+     * @param categoryId
+     */
+    private void handlerLoadResult(HomePagerContent result, int categoryId) {
+        for (ICategoryPagerCallback callback : callbacks) {
+            if (callback.getCategoryId() == categoryId) {
+                if (result == null || result.getData().size() == 0) {
+                    callback.onLoadMoreEmpty();
+                }else {
+                    callback.onLoadMoreLoaded(result.getData());
+                }
+            }
+        }
+    }
+
+    /**
+     * 加载更多数据失败
+     * @param categoryId
+     */
+    private void handlerLoadMoreError(int categoryId) {
+        mCurrentPage--;
+        pagerInfo.put(categoryId, mCurrentPage);
+        for (ICategoryPagerCallback callback : callbacks) {
+            if (callback.getCategoryId() == categoryId) {
+                callback.onLoadMoreError();
+            }
+        }
     }
 
     @Override

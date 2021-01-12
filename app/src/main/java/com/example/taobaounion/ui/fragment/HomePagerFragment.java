@@ -19,10 +19,14 @@ import com.example.taobaounion.presenter.ICategoryPagerPresenter;
 import com.example.taobaounion.presenter.impl.CategoryPagerPresenterImpl;
 import com.example.taobaounion.ui.adapter.HomePagerContentAdapter;
 import com.example.taobaounion.ui.adapter.LooperPagerAdapter;
+import com.example.taobaounion.ui.custom.TbNestedScrollView;
 import com.example.taobaounion.utils.Constants;
 import com.example.taobaounion.utils.LogUtils;
 import com.example.taobaounion.utils.SizeUtils;
+import com.example.taobaounion.utils.ToastUtils;
 import com.example.taobaounion.view.ICategoryPagerCallback;
+import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
+import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 
 import java.util.List;
 
@@ -40,7 +44,14 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     public TextView titleTv;
     @BindView(R.id.looper_point_container)
     public LinearLayout looperPointContainer;
-
+    @BindView(R.id.home_pager_refresh)
+    public TwinklingRefreshLayout mRefreshLayout;
+    @BindView(R.id.home_pager_parent)
+    public LinearLayout homePagerParent;
+    @BindView(R.id.home_pager_scroll)
+    public TbNestedScrollView homePagerScroll;
+    @BindView(R.id.home_pager_header_container)
+    public LinearLayout homeHeaderContainer;
     private HomePagerContentAdapter mContentAdapter;
     private LooperPagerAdapter mPagerAdapter;
 
@@ -78,10 +89,26 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
 
         looperPager.setAdapter(mPagerAdapter);
 
+        //设置refresh相关内容
+        mRefreshLayout.setEnableRefresh(false);
+        mRefreshLayout.setEnableLoadmore(true);
     }
 
     @Override
     protected void initListener() {
+//        homePagerParent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                int headerHeight = homeHeaderContainer.getMeasuredHeight();
+//                int measuredHeight = homePagerParent.getMeasuredHeight();
+//                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mContentList.getLayoutParams();
+//                layoutParams.height = measuredHeight;
+//                mContentList.setLayoutParams(layoutParams);
+//                if (measuredHeight != 0) {
+//                    homePagerParent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+//                }
+//            }
+//        });
         looperPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -101,6 +128,16 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
             @Override
             public void onPageScrollStateChanged(int state) {
 
+            }
+        });
+
+        mRefreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
+            @Override
+            public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
+                LogUtils.d(HomePagerFragment.this,"加载更多.......");
+                if (mPresenter != null) {
+                    mPresenter.loadMore(mMaterialId);
+                }
             }
         });
     }
@@ -145,11 +182,19 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
         setUpState(State.SUCCESS);
         //数据列表加载到了，更新UI
         mContentAdapter.setData(contents);
+        if (mRefreshLayout != null) {
+            mRefreshLayout.onFinishRefresh();
+        }
     }
 
     @Override
     public void onLoadMoreLoaded(List<HomePagerContent.DataBean> contents) {
-
+        //添加到适配器数据的底部
+        mContentAdapter.addData(contents);
+        if (mRefreshLayout != null) {
+            mRefreshLayout.finishLoadmore();
+        }
+        ToastUtils.showToast("加载了"+contents.size()+"数据");
     }
 
     @Override
@@ -200,12 +245,15 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
 
     @Override
     public void onLoadMoreError() {
-
+        if (mRefreshLayout != null) {
+            mRefreshLayout.finishLoadmore();
+        }
+        ToastUtils.showToast("网络异常,请稍后重试");
     }
 
     @Override
     public void onLoadMoreEmpty() {
-
+        ToastUtils.showToast("没有更多商品了");
     }
 
     @Override

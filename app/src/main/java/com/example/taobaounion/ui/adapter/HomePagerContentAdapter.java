@@ -50,6 +50,14 @@ public class HomePagerContentAdapter extends RecyclerView.Adapter<HomePagerConte
         notifyDataSetChanged();
     }
 
+    public void addData(List<HomePagerContent.DataBean> contents) {
+        //添加之前拿到原来的size
+        int olderSize = data.size();
+        data.addAll(contents);
+        //更新ui
+        notifyItemRangeChanged(olderSize,contents.size());
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.goods_cover)
         public ImageView cover;
@@ -78,6 +86,7 @@ public class HomePagerContentAdapter extends RecyclerView.Adapter<HomePagerConte
         public void setData(HomePagerContent.DataBean dataBean) {
             Context context = itemView.getContext();
             title.setText(dataBean.getTitle());
+            ViewGroup.LayoutParams layoutParams = cover.getLayoutParams();
             Glide.with(context).load(UrlUtils.getCoverPath(dataBean.getPict_url())).into(cover);
             int couponAmount = dataBean.getCoupon_amount();
             String finalPrice = dataBean.getZk_final_price();
