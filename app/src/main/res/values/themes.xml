@@ -5,4 +5,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
+    <declare-styleable name="AutoLoopStyle">
+        <attr name="duration" format="integer"></attr>
+    </declare-styleable>
 </resources>

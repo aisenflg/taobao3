@@ -24,7 +24,8 @@ import butterknife.ButterKnife;
 
 public class HomePagerContentAdapter extends RecyclerView.Adapter<HomePagerContentAdapter.MyViewHolder> {
 
-    List<HomePagerContent.DataBean> data = new ArrayList<>();
+    List<HomePagerContent.DataBean> mData = new ArrayList<>();
+    private onListItemClickListener mItemClickListener = null;
 
     @NonNull
     @Override
@@ -35,25 +36,34 @@ public class HomePagerContentAdapter extends RecyclerView.Adapter<HomePagerConte
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        HomePagerContent.DataBean dataBean = data.get(position);
+        HomePagerContent.DataBean dataBean = mData.get(position);
         holder.setData(dataBean);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mItemClickListener != null) {
+                    HomePagerContent.DataBean item = mData.get(position);
+                    mItemClickListener.onItemClick(item);
+                }
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return data.size()> 0 ? data.size() : 0;
+        return mData.size()> 0 ? mData.size() : 0;
     }
 
     public void setData(List<HomePagerContent.DataBean> contents) {
-        data.clear();
-        data.addAll(contents);
+        mData.clear();
+        mData.addAll(contents);
         notifyDataSetChanged();
     }
 
     public void addData(List<HomePagerContent.DataBean> contents) {
         //添加之前拿到原来的size
-        int olderSize = data.size();
-        data.addAll(contents);
+        int olderSize = mData.size();
+        mData.addAll(contents);
         //更新ui
         notifyItemRangeChanged(olderSize,contents.size());
     }
@@ -97,5 +107,14 @@ public class HomePagerContentAdapter extends RecyclerView.Adapter<HomePagerConte
             originalPriceTv.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
             sellCountTv.setText(String.format(context.getString(R.string.text_sell_count), dataBean.getVolume()));
         }
+    }
+
+    public void setonListItemClickListener(onListItemClickListener listener){
+        this.mItemClickListener = listener;
+    }
+
+
+    public interface onListItemClickListener{
+        void onItemClick(HomePagerContent.DataBean item);
     }
 }

@@ -17,6 +17,7 @@ import java.util.List;
 public class LooperPagerAdapter extends PagerAdapter {
 
     List<HomePagerContent.DataBean> mData = new ArrayList<>();
+    private onLooperItemClickListener mItemClickListener;
 
     @Override
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
@@ -38,6 +39,15 @@ public class LooperPagerAdapter extends PagerAdapter {
         iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
         String coverPath = UrlUtils.getCoverPath(dataBean.getPict_url());
         Glide.with(container.getContext()).load(coverPath).into(iv);
+        iv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mItemClickListener != null) {
+                    HomePagerContent.DataBean item = mData.get(realPosition);
+                    mItemClickListener.onLooperItemClick(item);
+                }
+            }
+        });
         container.addView(iv);
         return iv;
     }
@@ -56,5 +66,14 @@ public class LooperPagerAdapter extends PagerAdapter {
         mData.clear();
         mData.addAll(contents);
         notifyDataSetChanged();
+    }
+
+    public void setonListItemClickListener(onLooperItemClickListener listener){
+        this.mItemClickListener = listener;
+    }
+
+
+    public interface onLooperItemClickListener{
+        void onLooperItemClick(HomePagerContent.DataBean item);
     }
 }

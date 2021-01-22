@@ -12,8 +12,8 @@ import com.example.taobaounion.R;
 import com.example.taobaounion.base.BaseFragment;
 import com.example.taobaounion.model.domain.Categories;
 import com.example.taobaounion.presenter.IHomePresenter;
-import com.example.taobaounion.presenter.impl.HomePresenterImpl;
 import com.example.taobaounion.ui.adapter.HomePagerAdapter;
+import com.example.taobaounion.utils.PresenterManger;
 import com.example.taobaounion.view.IHomeCallback;
 import com.google.android.material.tabs.TabLayout;
 
@@ -49,7 +49,7 @@ public class HomeFragment extends BaseFragment implements IHomeCallback {
     @Override
     protected void initPresenter() {
         //创建presenter
-        mHomePresenter = new HomePresenterImpl();
+        mHomePresenter = PresenterManger.getInstance().getHomePresenter();
         mHomePresenter.registerViewCallback(this);
     }
 

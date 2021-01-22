@@ -9,4 +9,5 @@
     <string name="text_goods_off_prise">省%1$d元</string>
     <string name="text_goods_original_prise">¥%1$s</string>
     <string name="text_sell_count">%1$d人已购买</string>
+    <string name="text_tao_kou_ling">淘口令</string>
 </resources>

@@ -1,8 +1,10 @@
 package com.example.taobaounion.ui.fragment;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,30 +18,33 @@ import com.example.taobaounion.base.BaseFragment;
 import com.example.taobaounion.model.domain.Categories;
 import com.example.taobaounion.model.domain.HomePagerContent;
 import com.example.taobaounion.presenter.ICategoryPagerPresenter;
-import com.example.taobaounion.presenter.impl.CategoryPagerPresenterImpl;
+import com.example.taobaounion.presenter.ITicketPresenter;
+import com.example.taobaounion.ui.activity.TicketActivity;
 import com.example.taobaounion.ui.adapter.HomePagerContentAdapter;
 import com.example.taobaounion.ui.adapter.LooperPagerAdapter;
-import com.example.taobaounion.ui.custom.TbNestedScrollView;
+import com.example.taobaounion.ui.custom.AutoLoopViewPager;
 import com.example.taobaounion.utils.Constants;
 import com.example.taobaounion.utils.LogUtils;
+import com.example.taobaounion.utils.PresenterManger;
 import com.example.taobaounion.utils.SizeUtils;
 import com.example.taobaounion.utils.ToastUtils;
 import com.example.taobaounion.view.ICategoryPagerCallback;
 import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
+import com.lcodecore.tkrefreshlayout.views.TbNestedScrollView;
 
 import java.util.List;
 
 import butterknife.BindView;
 
-public class HomePagerFragment extends BaseFragment implements ICategoryPagerCallback {
+public class HomePagerFragment extends BaseFragment implements ICategoryPagerCallback, HomePagerContentAdapter.onListItemClickListener, LooperPagerAdapter.onLooperItemClickListener {
 
     private ICategoryPagerPresenter mPresenter;
     private int mMaterialId;
     @BindView(R.id.home_pager_content_list)
     public RecyclerView mContentList;
     @BindView(R.id.looper_pager)
-    public ViewPager looperPager;
+    public AutoLoopViewPager looperPager;
     @BindView(R.id.home_pager_title)
     public TextView titleTv;
     @BindView(R.id.looper_point_container)
@@ -53,14 +58,15 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     @BindView(R.id.home_pager_header_container)
     public LinearLayout homeHeaderContainer;
     private HomePagerContentAdapter mContentAdapter;
-    private LooperPagerAdapter mPagerAdapter;
+    private LooperPagerAdapter mLooperPagerAdapter;
+    private ITicketPresenter mTickerPresenter;
 
-    public static HomePagerFragment newInstance(Categories.DataBean category){
+    public static HomePagerFragment newInstance(Categories.DataBean category) {
 
         HomePagerFragment homePagerFragment = new HomePagerFragment();
         Bundle bundle = new Bundle();
-        bundle.putString(Constants.KEY_HOME_PAGER_TITLE,category.getTitle());
-        bundle.putInt(Constants.KEY_HOME_PAGER_MATERIAL_ID,category.getId());
+        bundle.putString(Constants.KEY_HOME_PAGER_TITLE, category.getTitle());
+        bundle.putInt(Constants.KEY_HOME_PAGER_MATERIAL_ID, category.getId());
         homePagerFragment.setArguments(bundle);
         return homePagerFragment;
     }
@@ -77,17 +83,17 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
         mContentList.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-                 outRect.top = 8;
-                 outRect.bottom = 8;
+                outRect.top = 8;
+                outRect.bottom = 8;
 
             }
         });
         mContentAdapter = new HomePagerContentAdapter();
         mContentList.setAdapter(mContentAdapter);
         //轮播图
-        mPagerAdapter = new LooperPagerAdapter();
+        mLooperPagerAdapter = new LooperPagerAdapter();
 
-        looperPager.setAdapter(mPagerAdapter);
+        looperPager.setAdapter(mLooperPagerAdapter);
 
         //设置refresh相关内容
         mRefreshLayout.setEnableRefresh(false);
@@ -95,20 +101,42 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        //可见的时候开始轮播
+        looperPager.startLoop();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //暂停轮播
+        looperPager.stopLoop();
+    }
+
+    @Override
     protected void initListener() {
-//        homePagerParent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//            @Override
-//            public void onGlobalLayout() {
-//                int headerHeight = homeHeaderContainer.getMeasuredHeight();
-//                int measuredHeight = homePagerParent.getMeasuredHeight();
-//                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mContentList.getLayoutParams();
-//                layoutParams.height = measuredHeight;
-//                mContentList.setLayoutParams(layoutParams);
-//                if (measuredHeight != 0) {
-//                    homePagerParent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-//                }
-//            }
-//        });
+        //点击事件
+        mContentAdapter.setonListItemClickListener(this);
+        mLooperPagerAdapter.setonListItemClickListener(this);
+
+        homePagerParent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (homeHeaderContainer == null) {
+                    return;
+                }
+                int headerHeight = homeHeaderContainer.getMeasuredHeight();
+                int measuredHeight = homePagerParent.getMeasuredHeight();
+                homePagerScroll.setHeaderHeight(headerHeight);
+                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mContentList.getLayoutParams();
+                layoutParams.height = measuredHeight;
+                mContentList.setLayoutParams(layoutParams);
+                if (measuredHeight != 0) {
+                    homePagerParent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            }
+        });
         looperPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -117,10 +145,10 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
 
             @Override
             public void onPageSelected(int position) {
-                if (mPagerAdapter.getDataSize() == 0) {
+                if (mLooperPagerAdapter.getDataSize() == 0) {
                     return;
                 }
-                int targetPosition = position % mPagerAdapter.getDataSize();
+                int targetPosition = position % mLooperPagerAdapter.getDataSize();
                 //切换指示器
                 updateLooperIndicator(targetPosition);
             }
@@ -134,7 +162,7 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
         mRefreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
-                LogUtils.d(HomePagerFragment.this,"加载更多.......");
+                LogUtils.d(HomePagerFragment.this, "加载更多.......");
                 if (mPresenter != null) {
                     mPresenter.loadMore(mMaterialId);
                 }
@@ -144,6 +172,7 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
 
     /**
      * 切换指示器
+     *
      * @param targetPosition
      */
     private void updateLooperIndicator(int targetPosition) {
@@ -151,7 +180,7 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
             View point = looperPointContainer.getChildAt(i);
             if (i == targetPosition) {
                 point.setBackgroundResource(R.drawable.shape_indicator_point_select);
-            }else {
+            } else {
                 point.setBackgroundResource(R.drawable.shape_indicator_point_normal);
             }
         }
@@ -159,7 +188,7 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
 
     @Override
     protected void initPresenter() {
-        mPresenter = CategoryPagerPresenterImpl.getInstance();
+        mPresenter = PresenterManger.getInstance().getICategoryPagerPresenter();
         mPresenter.registerViewCallback(this);
     }
 
@@ -194,31 +223,31 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
         if (mRefreshLayout != null) {
             mRefreshLayout.finishLoadmore();
         }
-        ToastUtils.showToast("加载了"+contents.size()+"数据");
+        ToastUtils.showToast("加载了" + contents.size() + "数据");
     }
 
     @Override
     public void onLooperListLoaded(List<HomePagerContent.DataBean> contents) {
-        LogUtils.d(this,"looper size ----------->"+contents.size());
-        mPagerAdapter.setData(contents);
+        LogUtils.d(this, "looper size ----------->" + contents.size());
+        mLooperPagerAdapter.setData(contents);
         //中间点的size不一定为0,所以显示的就不是第一个
         int dx = (Integer.MAX_VALUE / 2) % contents.size();
-        int targetCenterPosition = (Integer.MAX_VALUE / 2) -dx;
+        int targetCenterPosition = (Integer.MAX_VALUE / 2) - dx;
         looperPager.setCurrentItem(targetCenterPosition);
         //添加点
         for (int i = 0; i < contents.size(); i++) {
             View point = new View(getContext());
             int size = SizeUtils.dip2px(getContext(), 8);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(size,size);
-            layoutParams.leftMargin = SizeUtils.dip2px(getContext(),5);
-            layoutParams.rightMargin = SizeUtils.dip2px(getContext(),5);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(size, size);
+            layoutParams.leftMargin = SizeUtils.dip2px(getContext(), 5);
+            layoutParams.rightMargin = SizeUtils.dip2px(getContext(), 5);
             point.setLayoutParams(layoutParams);
             if (i == 0) {
                 point.setBackgroundResource(R.drawable.shape_indicator_point_select);
-            }else {
+            } else {
                 point.setBackgroundResource(R.drawable.shape_indicator_point_normal);
             }
-                looperPointContainer.addView(point);
+            looperPointContainer.addView(point);
         }
     }
 
@@ -261,5 +290,23 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
         if (mPresenter != null) {
             mPresenter.unregisterViewCallback(this);
         }
+    }
+
+    @Override
+    public void onItemClick(HomePagerContent.DataBean item) {
+        handlerItem(item);
+
+    }
+
+    private void handlerItem(HomePagerContent.DataBean item) {
+        //拿到TickerPresenter
+        mTickerPresenter = PresenterManger.getInstance().getTickerPresenter();
+        mTickerPresenter.getTicket(item.getTitle(),item.getClick_url(), item.getPict_url());
+        startActivity(new Intent(getActivity(), TicketActivity.class));
+    }
+
+    @Override
+    public void onLooperItemClick(HomePagerContent.DataBean item) {
+        handlerItem(item);
     }
 }
