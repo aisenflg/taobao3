@@ -2,9 +2,13 @@ package com.example.taobaounion.utils;
 
 import com.example.taobaounion.presenter.ICategoryPagerPresenter;
 import com.example.taobaounion.presenter.IHomePresenter;
+import com.example.taobaounion.presenter.IOnSellPagePresenter;
+import com.example.taobaounion.presenter.ISelectedPagePresenter;
 import com.example.taobaounion.presenter.ITicketPresenter;
 import com.example.taobaounion.presenter.impl.CategoryPagerPresenterImpl;
 import com.example.taobaounion.presenter.impl.HomePresenterImpl;
+import com.example.taobaounion.presenter.impl.OnSellPagePresenterImpl;
+import com.example.taobaounion.presenter.impl.SelectedPagePresenterImpl;
 import com.example.taobaounion.presenter.impl.TickerPresenterImpl;
 
 public class PresenterManger {
@@ -13,6 +17,9 @@ public class PresenterManger {
     private final ICategoryPagerPresenter mICategoryPagerPresenter;
     private final IHomePresenter mHomePresenter;
     private final ITicketPresenter mTickerPresenter;
+    private final ISelectedPagePresenter mISelectedPagePresenter;
+    private final IOnSellPagePresenter mOnSellPagePresenter;
+
 
     public static PresenterManger getInstance() {
         return ourInstance;
@@ -30,10 +37,21 @@ public class PresenterManger {
         return mTickerPresenter;
     }
 
+    public ISelectedPagePresenter getISelectedPagePresenter(){
+        return mISelectedPagePresenter;
+    }
+
+    public IOnSellPagePresenter getIOnSellPagePresenter(){
+        return mOnSellPagePresenter;
+    }
+
+
     private PresenterManger(){
         mICategoryPagerPresenter =new CategoryPagerPresenterImpl();
         mHomePresenter = new HomePresenterImpl();
         mTickerPresenter = new TickerPresenterImpl();
+        mISelectedPagePresenter = new SelectedPagePresenterImpl();
+        mOnSellPagePresenter = new OnSellPagePresenterImpl();
     }
 
 }

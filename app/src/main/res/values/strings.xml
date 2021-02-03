@@ -10,4 +10,7 @@
     <string name="text_goods_original_prise">¥%1$s</string>
     <string name="text_sell_count">%1$d人已购买</string>
     <string name="text_tao_kou_ling">淘口令</string>
+    <string name="text_loading">玩命加载中...</string>
+    <string name="selected_title">精选宝贝</string>
+    <string name="text_on_sell">特惠宝贝</string>
 </resources>
