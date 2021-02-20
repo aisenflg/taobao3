@@ -1,9 +1,7 @@
 package com.example.taobaounion.ui.fragment;
 
-import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
@@ -18,9 +16,9 @@ import com.example.taobaounion.R;
 import com.example.taobaounion.base.BaseFragment;
 import com.example.taobaounion.model.domain.Categories;
 import com.example.taobaounion.model.domain.HomePagerContent;
+import com.example.taobaounion.model.domain.IBaseInfo;
 import com.example.taobaounion.presenter.ICategoryPagerPresenter;
 import com.example.taobaounion.presenter.ITicketPresenter;
-import com.example.taobaounion.ui.activity.TicketActivity;
 import com.example.taobaounion.ui.adapter.HomePagerContentAdapter;
 import com.example.taobaounion.ui.adapter.LooperPagerAdapter;
 import com.example.taobaounion.ui.custom.AutoLoopViewPager;
@@ -28,6 +26,7 @@ import com.example.taobaounion.utils.Constants;
 import com.example.taobaounion.utils.LogUtils;
 import com.example.taobaounion.utils.PresenterManger;
 import com.example.taobaounion.utils.SizeUtils;
+import com.example.taobaounion.utils.TicketUtils;
 import com.example.taobaounion.utils.ToastUtils;
 import com.example.taobaounion.view.ICategoryPagerCallback;
 import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
@@ -294,27 +293,19 @@ public class HomePagerFragment extends BaseFragment implements ICategoryPagerCal
     }
 
     @Override
-    public void onItemClick(HomePagerContent.DataBean item) {
+    public void onItemClick(IBaseInfo item) {
         handlerItem(item);
 
     }
 
-    private void handlerItem(HomePagerContent.DataBean item) {
+    private void handlerItem(IBaseInfo item) {
         //拿到TickerPresenter
-        mTickerPresenter = PresenterManger.getInstance().getTickerPresenter();
-       //领劵界面
-        String url = item.getCoupon_click_url();
-        //没有卷时,跳转到购买界面
-        if (TextUtils.isEmpty(url)) {
-            //购买界面
-            url = item.getClick_url();
-        }
-        mTickerPresenter.getTicket(item.getTitle(),url, item.getPict_url());
-        startActivity(new Intent(getActivity(), TicketActivity.class));
+
+        TicketUtils.toTicketPage(item,getContext());
     }
 
     @Override
-    public void onLooperItemClick(HomePagerContent.DataBean item) {
+    public void onLooperItemClick(IBaseInfo item) {
         handlerItem(item);
     }
 }

@@ -1,8 +1,6 @@
 package com.example.taobaounion.ui.fragment;
 
-import android.content.Intent;
 import android.graphics.Rect;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +12,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.taobaounion.R;
 import com.example.taobaounion.base.BaseFragment;
+import com.example.taobaounion.model.domain.IBaseInfo;
 import com.example.taobaounion.model.domain.SelectedContent;
 import com.example.taobaounion.model.domain.SelectedPageCategory;
 import com.example.taobaounion.presenter.ISelectedPagePresenter;
 import com.example.taobaounion.presenter.ITicketPresenter;
-import com.example.taobaounion.ui.activity.TicketActivity;
 import com.example.taobaounion.ui.adapter.SelectedPageLeftAdapter;
 import com.example.taobaounion.ui.adapter.SelectedPageRightAdapter;
 import com.example.taobaounion.utils.PresenterManger;
 import com.example.taobaounion.utils.SizeUtils;
+import com.example.taobaounion.utils.TicketUtils;
 import com.example.taobaounion.view.ISelectedPageCallback;
 
 import java.util.List;
@@ -106,18 +105,8 @@ public class SelectedFragment extends BaseFragment implements ISelectedPageCallb
      * @param data
      */
     @Override
-    public void onItemRightClickListener(SelectedContent.DataBean.TbkUatmFavoritesItemGetResponseBean.ResultsBean.UatmTbkItemBean data) {
-        //拿到TickerPresenter
-        mTickerPresenter = PresenterManger.getInstance().getTickerPresenter();
-        //领劵界面
-        String url = data.getCoupon_click_url();
-        //没有卷时,跳转到购买界面
-        if (TextUtils.isEmpty(url)) {
-            //购买界面
-            url = data.getClick_url();
-        }
-        mTickerPresenter.getTicket(data.getTitle(),url, data.getPict_url());
-        startActivity(new Intent(getActivity(), TicketActivity.class));
+    public void onItemRightClickListener(IBaseInfo data) {
+        TicketUtils.toTicketPage(data, getContext());
     }
 
 

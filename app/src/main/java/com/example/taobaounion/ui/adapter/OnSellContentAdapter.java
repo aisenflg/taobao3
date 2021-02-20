@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.taobaounion.R;
+import com.example.taobaounion.model.domain.IBaseInfo;
 import com.example.taobaounion.model.domain.OnSellContent;
 import com.example.taobaounion.utils.UrlUtils;
 
@@ -99,6 +100,6 @@ public class OnSellContentAdapter extends RecyclerView.Adapter<OnSellContentAdap
     }
 
     public interface onSellItemClickListener {
-        void onSellItemClickListener(OnSellContent.DataBean.TbkDgOptimusMaterialResponseBean.ResultListBean.MapDataBean item);
+        void onSellItemClickListener(IBaseInfo item);
     }
 }
