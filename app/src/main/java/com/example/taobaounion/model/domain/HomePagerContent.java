@@ -49,7 +49,7 @@ public class HomePagerContent {
         this.data = data;
     }
 
-    public static class DataBean implements IBaseInfo {
+    public static class DataBean implements ILinearItemInfo {
         /**
          * category_id : 50013196
          * category_name : null
@@ -83,7 +83,7 @@ public class HomePagerContent {
         private Object category_name;
         private String click_url;
         private String commission_rate;
-        private int coupon_amount;
+        private long coupon_amount;
         private String coupon_click_url;
         private String coupon_end_time;
         private Object coupon_info;
@@ -103,7 +103,7 @@ public class HomePagerContent {
         private SmallImagesDTO small_images;
         private String title;
         private int user_type;
-        private int volume;
+        private long volume;
         private String zk_final_price;
 
         public int getCategory_id() {
@@ -138,11 +138,11 @@ public class HomePagerContent {
             this.commission_rate = commission_rate;
         }
 
-        public int getCoupon_amount() {
+        public long getCoupon_amount() {
             return coupon_amount;
         }
 
-        public void setCoupon_amount(int coupon_amount) {
+        public void setCoupon_amount(long coupon_amount) {
             this.coupon_amount = coupon_amount;
         }
 
@@ -308,11 +308,21 @@ public class HomePagerContent {
             this.user_type = user_type;
         }
 
-        public int getVolume() {
+        @Override
+        public String getFinalPrise() {
+            return zk_final_price;
+        }
+
+        @Override
+        public long getCouponAmount() {
+            return coupon_amount;
+        }
+
+        public long getVolume() {
             return volume;
         }
 
-        public void setVolume(int volume) {
+        public void setVolume(long volume) {
             this.volume = volume;
         }
 

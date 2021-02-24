@@ -84,7 +84,7 @@ public class TicketActivity extends BaseActivity implements ITicketPagerCallback
     @Override
     public void onTicketLoaded(String cover, TicketResult result) {
         if (mCover != null && !TextUtils.isEmpty(cover)) {
-            Glide.with(this).load(UrlUtils.getCoverPath(cover)).into(mCover);
+            Glide.with(this).load(UrlUtils.getTicketUrl(cover)).into(mCover);
         }
         if (result != null && result.getData().getTbk_tpwd_create_response() != null) {
             mTicketCode.setText(result.getData().getTbk_tpwd_create_response().getData().getModel());

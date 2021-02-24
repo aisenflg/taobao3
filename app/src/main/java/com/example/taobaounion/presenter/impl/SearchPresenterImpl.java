@@ -40,15 +40,17 @@ public class SearchPresenterImpl implements ISearchPresenter {
     @Override
     public void getHistories() {
         Histories histories = mJsonCacheUtil.getValue(KEY_HISTORY, Histories.class);
-        if (mCallback != null && histories != null
-                && histories.getHistories() != null && histories.getHistories().size() != 0) {
-            mCallback.onHistoriesLoaded(histories.getHistories());
+        if (mCallback != null) {
+            mCallback.onHistoriesLoaded(histories);
         }
     }
 
     @Override
     public void delHistories() {
         mJsonCacheUtil.delCache(KEY_HISTORY);
+        if (mCallback !=null) {
+            mCallback.onHistoriesDel();
+        }
 
     }
 
@@ -143,7 +145,6 @@ public class SearchPresenterImpl implements ISearchPresenter {
                 mCallback.onEmpty();
             }
         } else {
-
             this.doSearch(mCurrentKeyword);
         }
     }
@@ -189,11 +190,11 @@ public class SearchPresenterImpl implements ISearchPresenter {
                 if (response.code() == HttpURLConnection.HTTP_OK) {
                     SearchRecommend result = response.body();
                     if (mCallback != null) {
-                        List<String> histories = new ArrayList<>();
+                        List<SearchRecommend.DataBean> recommendWords = new ArrayList<>();
                         for (SearchRecommend.DataBean data : result.getData()) {
-                            histories.add(data.getKeyword());
+                            recommendWords.add(data);
                         }
-                        mCallback.onHistoriesLoaded(histories);
+                        mCallback.onRecommendWordsLoaded(recommendWords);
                     }
                 }
             }

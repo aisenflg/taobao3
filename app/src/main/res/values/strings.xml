@@ -13,4 +13,6 @@
     <string name="text_loading">玩命加载中...</string>
     <string name="selected_title">精选宝贝</string>
     <string name="text_on_sell">特惠宝贝</string>
+    <string name="text_search_history">搜索历史</string>
+    <string name="text_search_hot">热门推荐</string>
 </resources>
