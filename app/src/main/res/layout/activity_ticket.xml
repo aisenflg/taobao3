@@ -30,13 +30,13 @@
     <RelativeLayout
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:layout_marginTop="33dp">
+        android:layout_marginTop="100dp">
 
         <ImageView
             android:id="@+id/ticket_cover"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/gray" />
+            android:src="@mipmap/no_image"/>
 
 
         <com.example.taobaounion.ui.custom.LoadingView

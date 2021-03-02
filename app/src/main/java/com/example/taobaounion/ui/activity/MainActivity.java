@@ -17,7 +17,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import butterknife.BindView;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements IMainActivity {
 
     @BindView(R.id.main_navigation_bar)
     public BottomNavigationView mBottomNavigationView;
@@ -100,4 +100,8 @@ public class MainActivity extends BaseActivity {
     }
 
 
+    @Override
+    public void switchToSearch() {
+        mBottomNavigationView.setSelectedItemId(R.id.search);
+    }
 }

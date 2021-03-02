@@ -28,6 +28,7 @@
             android:src="@mipmap/scan_white" />
 
         <EditText
+            android:id="@+id/home_search"
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_marginLeft="10dp"

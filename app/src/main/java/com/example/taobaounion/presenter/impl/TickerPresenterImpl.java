@@ -78,6 +78,7 @@ public class TickerPresenterImpl implements ITicketPresenter {
 
     @Override
     public void registerViewCallback(ITicketPagerCallback callback) {
+        this.mViewCallback = callback;
         if (mCurrentState != LoadState.NONE) {
             if (mCurrentState == LoadState.SUCCESS) {
                 onLoadedTicketSuccess();
@@ -86,7 +87,7 @@ public class TickerPresenterImpl implements ITicketPresenter {
             }else if (mCurrentState == LoadState.ERROR){
                 onLoadingTicketError();
             }
-            this.mViewCallback = callback;
+
         }
     }
 

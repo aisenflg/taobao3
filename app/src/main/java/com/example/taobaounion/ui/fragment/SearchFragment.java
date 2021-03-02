@@ -352,6 +352,8 @@ public class SearchFragment extends BaseFragment implements ISearchPageCallback,
             //回到顶部
             mResultRecycler.scrollToPosition(0);
             mSearchInput.setText(text);
+            mSearchInput.setFocusable(true);
+            mSearchInput.setSelection(text.length());
             mISearchPresenter.doSearch(text);
         }
     }

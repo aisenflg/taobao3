@@ -1,17 +1,22 @@
 package com.example.taobaounion.ui.fragment;
 
 
-
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
 
+import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.taobaounion.R;
 import com.example.taobaounion.base.BaseFragment;
 import com.example.taobaounion.model.domain.Categories;
 import com.example.taobaounion.presenter.IHomePresenter;
+import com.example.taobaounion.ui.activity.MainActivity;
+import com.example.taobaounion.ui.activity.ScanQrCodeActivity;
 import com.example.taobaounion.ui.adapter.HomePagerAdapter;
 import com.example.taobaounion.utils.PresenterManger;
 import com.example.taobaounion.view.IHomeCallback;
@@ -30,6 +35,10 @@ public class HomeFragment extends BaseFragment implements IHomeCallback {
 
     @BindView(R.id.home_pager)
     public ViewPager homePager;
+    @BindView(R.id.home_search)
+    public EditText mHomeSearch;
+    @BindView(R.id.scan_icon)
+    public ImageView mHomeScan;
     private HomePagerAdapter mHomePagerAdapter;
 
     @Override
@@ -51,11 +60,25 @@ public class HomeFragment extends BaseFragment implements IHomeCallback {
         //创建presenter
         mHomePresenter = PresenterManger.getInstance().getHomePresenter();
         mHomePresenter.registerViewCallback(this);
+        mHomeSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentActivity activity = getActivity();
+                ((MainActivity) activity).switchToSearch();
+            }
+        });
+        mHomeScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //跳转到扫码界面
+                startActivity(new Intent(getActivity(), ScanQrCodeActivity.class ));
+            }
+        });
     }
 
     @Override
     protected View loadRootView(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.base_home_fragment_layout,container,false);
+        return inflater.inflate(R.layout.base_home_fragment_layout, container, false);
     }
 
     @Override

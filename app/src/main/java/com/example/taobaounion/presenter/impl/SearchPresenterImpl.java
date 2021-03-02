@@ -115,9 +115,7 @@ public class SearchPresenterImpl implements ISearchPresenter {
                         if (mCallback != null) {
                             mCallback.onSearch(result);
                         }
-                    } else {
-                        mCallback.onEmpty();
-                    }
+                    } 
                 } else {
                     onNetworkError();
                 }
